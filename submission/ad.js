@@ -1,6 +1,7 @@
 // Configuration
-const targetCount = 16;
-const targetTimeSeconds = 10;
+const targetsPerSecond = 1.5;
+
+let adTimeRemaining = null;
 
 class Game {
     // Elements
@@ -15,7 +16,8 @@ class Game {
     #targetMaxY = 0;
 
     // Runtime variables
-    #timeRemaining = targetTimeSeconds;
+    #targetCount = 0;
+    #timeRemaining = 0;
     #timerIntervalId = null;
     #clickCount = 0;
 
@@ -42,16 +44,24 @@ class Game {
 
     #targetRotationTiming = {
         duration: 1000,
-        iterations: targetTimeSeconds
+        iterations: this.#timeRemaining
     };
 
-    start() {
-        this.initializeState();
+    start(adTimeRemaining) {
+        if (adTimeRemaining === null) {
+            adFail();
+        }
+        console.log(adTimeRemaining);
+        this.initializeState(adTimeRemaining);
         this.#target.addEventListener('click', this.onTarget.bind(this));
         this.#timerIntervalId = setInterval(this.updateTimer.bind(this), 1000);
     }
 
-    initializeState() {
+    initializeState(adTimeRemaining) {
+        // Calculate game parameters
+        this.#targetCount = Math.round((adTimeRemaining - 5) * targetsPerSecond);
+        this.#timeRemaining = Math.round(adTimeRemaining - 5);
+
         // Instructions
         this.#instructions.style.display = 'block';
 
@@ -61,7 +71,7 @@ class Game {
 
         // Counter
         this.#counter.style.display = 'block';
-        this.#counter.textContent = this.#counterLabel + targetCount;
+        this.#counter.textContent = this.#counterLabel + this.#targetCount;
 
         // Target
         this.#target.style.display = 'block';
@@ -105,8 +115,8 @@ class Game {
     onTarget() {
         this.playHitSound();
         this.#clickCount++;
-        this.#counter.textContent = this.#counterLabel + (targetCount - this.#clickCount);
-        if (this.#clickCount >= targetCount) {
+        this.#counter.textContent = this.#counterLabel + (this.#targetCount - this.#clickCount);
+        if (this.#clickCount >= this.#targetCount) {
             this.cleanup();
             adSuccess();
             return;
@@ -137,7 +147,7 @@ function createListeners(game) {
 
 function onSkip(event, game) {
     event.target.style.display = 'none';
-    game.start();
+    game.start(adTimeRemaining);
 }
 
 function onMessage(event, game) {
@@ -146,6 +156,11 @@ function onMessage(event, game) {
     
     if (event.data.type === 'adStarted') {
         skipButton.style.display = 'block';
+    }
+
+    if (event.data.type === 'timeupdate') {
+        const { currentTime, duration } = event.data;
+        adTimeRemaining = duration - currentTime;
     }
     
     // By default, if the user doesn't "skip" the ad before the video ends,
