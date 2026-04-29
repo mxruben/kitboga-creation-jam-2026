@@ -59,8 +59,8 @@ class Game {
 
     initializeState(adTimeRemaining) {
         // Calculate game parameters
-        this.#targetCount = Math.round((adTimeRemaining - 5) * targetsPerSecond);
-        this.#timeRemaining = Math.round(adTimeRemaining - 5);
+        this.#targetCount = Math.round((adTimeRemaining - 1) * targetsPerSecond);
+        this.#timeRemaining = Math.round(adTimeRemaining - 1);
 
         // Instructions
         this.#instructions.style.display = 'block';
