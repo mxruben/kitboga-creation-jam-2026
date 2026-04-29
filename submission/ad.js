@@ -36,17 +36,6 @@ class Game {
         new Audio('assets/hit8.ogg'),
     ];
 
-    #targetAnimation = [
-        { transform: 'scale(1)' },
-        { transform: 'scale(0.9)' },
-        { transform: 'scale(1)' },
-    ];
-
-    #targetRotationTiming = {
-        duration: 1000,
-        iterations: this.#timeRemaining
-    };
-
     start(adTimeRemaining) {
         if (adTimeRemaining === null) {
             adFail();
@@ -109,7 +98,18 @@ class Game {
     }
 
     animateTarget() {
-        this.#target.animate(this.#targetAnimation, this.#targetRotationTiming);
+        const targetAnimation = [
+            { transform: 'scale(1)' },
+            { transform: 'scale(0.9)' },
+            { transform: 'scale(1)' },
+        ];
+
+        const targetRotationTiming = {
+            duration: 1000,
+            iterations: this.#timeRemaining
+        };
+
+        this.#target.animate(targetAnimation, targetRotationTiming);
     }
 
     onTarget() {
